@@ -53,4 +53,28 @@ namespace SimpleObjectComparer
             return propertyInfo?.GetValue(value);
         }
     }
+
+    public static class DeltaExtentions
+    {
+        public static HashSet<string> GetAllUniqueSimpleTypeKeys(this Delta delta)
+        {
+            var uniqueKeys = new HashSet<string>(delta.SimpleTypes.Keys);
+
+            foreach (var innerDelta in delta.ComplexTypes.Values)
+            {
+                uniqueKeys.UnionWith(innerDelta.GetAllUniqueSimpleTypeKeys());
+            }
+
+            foreach (var deltaList in delta.ComplexListTypes.Values)
+            {
+                foreach (var innerDelta in deltaList)
+                {
+                    uniqueKeys.UnionWith(innerDelta.GetAllUniqueSimpleTypeKeys());
+                }
+            }
+
+            return uniqueKeys;
+        }
+
+    }
 }
