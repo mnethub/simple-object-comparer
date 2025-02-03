@@ -16,4 +16,10 @@
     <ProjectReference Include="..\SimpleObjectComparer\SimpleObjectComparer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Json\json1.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

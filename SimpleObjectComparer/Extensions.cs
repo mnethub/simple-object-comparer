@@ -7,11 +7,9 @@ namespace SimpleObjectComparer
     {
         public static bool IsSimpleType(this Type type)
         {
-            var underlyingType = Nullable.GetUnderlyingType(type);
-            if (underlyingType != null && underlyingType.IsValueType)
-                return true;
+            ArgumentNullException.ThrowIfNull(type);
 
-            return type.IsPrimitive || type == typeof(string) || type == typeof(DateTime) ||  type == typeof(Guid) || type == typeof(TimeSpan);
+            return type.IsValueType || type == typeof(string);
         }
 
         public static bool IsComplexType(this Type type)
