@@ -7,11 +7,9 @@ namespace SimpleObjectComparer
     {
         public static bool IsSimpleType(this Type type)
         {
-            var underlyingType = Nullable.GetUnderlyingType(type);
-            if (underlyingType != null && underlyingType.IsValueType)
-                return true;
+            ArgumentNullException.ThrowIfNull(type);
 
-            return type.IsPrimitive || type == typeof(string) || type == typeof(DateTime) ||  type == typeof(Guid) || type == typeof(TimeSpan);
+            return type.IsValueType || type == typeof(string);
         }
 
         public static bool IsComplexType(this Type type)
@@ -52,5 +50,29 @@ namespace SimpleObjectComparer
 
             return propertyInfo?.GetValue(value);
         }
+    }
+
+    public static class DeltaExtentions
+    {
+        public static HashSet<string> GetAllUniqueSimpleTypeKeys(this Delta delta)
+        {
+            var uniqueKeys = new HashSet<string>(delta.SimpleTypes.Keys);
+
+            foreach (var innerDelta in delta.ComplexTypes.Values)
+            {
+                uniqueKeys.UnionWith(innerDelta.GetAllUniqueSimpleTypeKeys());
+            }
+
+            foreach (var deltaList in delta.ComplexListTypes.Values)
+            {
+                foreach (var innerDelta in deltaList)
+                {
+                    uniqueKeys.UnionWith(innerDelta.GetAllUniqueSimpleTypeKeys());
+                }
+            }
+
+            return uniqueKeys;
+        }
+
     }
 }

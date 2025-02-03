@@ -1,11 +1,12 @@
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 
 namespace SimpleObjectComparer
 {
     public class Comparer : IComparer
     {
-        private readonly Dictionary<string, PropertyInfo[]> _propertyInfoCache = [];
+        private readonly ConcurrentDictionary<string, PropertyInfo[]> _propertyInfoCache = [];
         private readonly CompareOptions _compareOptions;
         private readonly Dictionary<string, BaseTypeComparer> _customComparers; // For performance
 
@@ -242,8 +243,8 @@ namespace SimpleObjectComparer
                 return type.GetProperties();
 
             PropertyInfo[] propertyInfo;
-            if (type.FullName != null && _propertyInfoCache.ContainsKey(type.FullName))
-                propertyInfo = _propertyInfoCache[type.FullName];
+            if (type.FullName != null && _propertyInfoCache.TryGetValue(type.FullName, out PropertyInfo[]? value))
+                propertyInfo = value;
             else
             {
                 propertyInfo = type.GetProperties();

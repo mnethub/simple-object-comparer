@@ -1,0 +1,45 @@
+{
+  "FirstName": "Jane",
+  "LastName": "Doe",
+  "DateOfBirth": "1985-05-15T00:00:00",
+  "HomeAddress": {
+    "Street": "123 Main St",
+    "City": "Anytown",
+    "State": "CA",
+    "ZipCode": "12345",
+    "Contact": {
+      "Email": "jane.doe@example.com",
+      "Phone": "555-1234"
+    }
+  },
+  "JobHistory": [
+    {
+      "Title": "Software Developer",
+      "Salary": 90000.00,
+      "WorkAddress": {
+        "Street": "456 Tech St",
+        "City": "Techville",
+        "State": "CA",
+        "ZipCode": "67890",
+        "Contact": {
+          "Email": "hr@techcompany.com",
+          "Phone": "555-5678"
+        }
+      }
+    },
+    {
+      "Title": "Senior Developer",
+      "Salary": 120000.00,
+      "WorkAddress": {
+        "Street": "789 Dev St",
+        "City": "Devcity",
+        "State": "CA",
+        "ZipCode": "11223",
+        "Contact": {
+          "Email": "hr@devcompany.com",
+          "Phone": "555-9876"
+        }
+      }
+    }
+  ]
+}
