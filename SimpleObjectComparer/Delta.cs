@@ -13,6 +13,7 @@ namespace SimpleObjectComparer
         public bool IsModified { get; set; } = false;
 
         public Dictionary<string, object?> Keys { get; set; } = [];
+        public int? Index { get; set; }
 
         // Simple types
         public Dictionary<string, OldNewPair> SimpleTypes { get; set; } = [];

@@ -49,7 +49,6 @@ namespace SimpleObjectComparer
             {
                 delta.IsAdded = oldObject == null;
                 delta.IsDeleted = newObject == null;
-                //return delta;
             }
 
             //Get properties
@@ -135,10 +134,9 @@ namespace SimpleObjectComparer
 
         private List<Delta> KeyBasedComplexObjCompare(List<object?> list1, List<object?> list2, List<PropertyInfo> keyPropertyInfos)
         {
-            //TODO Consider Parallel foreach
-
             var deltas = new List<Delta>();
-            //Remove nulls for simplification
+
+            //Remove nulls
             list1.RemoveAll(item => item == null);
             list2.RemoveAll(item => item == null);
 
@@ -189,7 +187,10 @@ namespace SimpleObjectComparer
             {
                 var delta1 = Compare(list1[p1], list2[p2]);
                 if (delta1.IsModified || delta1.IsAdded || delta1.IsDeleted)
+                {
+                    delta1.Index = p1;
                     deltas.Add(delta1);
+                }
                 p1++;
                 p2++;
             }
@@ -197,14 +198,20 @@ namespace SimpleObjectComparer
             {
                 var delta1 = Compare(list1[p1], null);
                 if (delta1.IsModified || delta1.IsAdded || delta1.IsDeleted)
+                {
+                    delta1.Index = p1;
                     deltas.Add(delta1);
+                }
                 p1++;
             }
             while (p2 < list2.Count)
             {
                 var delta1 = Compare(null, list2[p2]);
                 if (delta1.IsModified || delta1.IsAdded || delta1.IsDeleted)
+                {
+                    delta1.Index = p2;
                     deltas.Add(delta1);
+                }
                 p2++;
             }
             return deltas;
