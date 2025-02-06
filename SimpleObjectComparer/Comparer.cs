@@ -143,7 +143,6 @@ namespace SimpleObjectComparer
             list2.RemoveAll(item => item == null);
 
             var list1Remove = new HashSet<object?>();
-            var list2Remove = new HashSet<object?>();
 
             foreach (var oldItem in list1)
             {
@@ -157,11 +156,10 @@ namespace SimpleObjectComparer
                         deltas.Add(delta);
 
                     list1Remove.Add(oldItem);
-                    list2Remove.Add(newItem);
+                    list2.Remove(newItem);
                 }
             }
-            list1.RemoveAll(item => list1Remove.Contains(item));
-            list2.RemoveAll(item => list2Remove.Contains(item));
+            list1.RemoveAll(list1Remove.Contains);
 
             foreach (var deletedItem in list1)
             {
