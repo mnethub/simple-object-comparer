@@ -83,7 +83,7 @@ namespace SimpleObjectComparer
                     if (underlyingType != null && underlyingType.IsSimpleType())
                     {
                         //Simple list
-                        if (!Utility.IsSimpleListEqual(oldValue, newValue, _customComparers, out OldNewPair listTuple))
+                        if (!Utility.IsSimpleListEqual(oldValue as IEnumerable , newValue as IEnumerable,underlyingType, _customComparers, out OldNewPair listTuple))
                         {
                             delta.SimpleListTypes.Add(propertyInfo.Name, listTuple);
                         }

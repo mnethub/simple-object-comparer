@@ -23,7 +23,7 @@ namespace SimpleObjectComparer
 
         public static bool IsCollectionOrArray(this Type type)
         {
-            return typeof(IEnumerable).IsAssignableFrom(type) || type.IsArray;
+            return typeof(IEnumerable).IsAssignableFrom(type);
         }
 
         public static Type? GetUnderlyingType(this Type collectionType)
@@ -49,6 +49,34 @@ namespace SimpleObjectComparer
                 return null;
 
             return propertyInfo?.GetValue(value);
+        }
+
+        public static int Count(this IEnumerable enumerable)
+        {
+            if (enumerable == null) return 0;
+
+            // Check if the enumerable is an ICollection
+            if (enumerable is ICollection collection)
+            {
+                return collection.Count;
+            }
+
+            // Check if the enumerable is an IEnumerable<object?>
+            if (enumerable is IEnumerable<object?> genericEnumerable)
+            {
+                if (genericEnumerable.TryGetNonEnumeratedCount(out int count))
+                    return count;
+                else
+                    return genericEnumerable.Count();
+            }
+
+            // Fallback to enumerating the sequence
+            int c = 0;
+            foreach (var item in enumerable)
+            {
+                c++;
+            }
+            return c;
         }
     }
 

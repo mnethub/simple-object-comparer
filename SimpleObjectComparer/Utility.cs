@@ -5,37 +5,41 @@ namespace SimpleObjectComparer
 {
     internal static class Utility
     {
-        public static bool IsSimpleListEqual(object? oldValue, object? newValue, Dictionary<string, BaseTypeComparer> customComparers, out OldNewPair oldNewPair)
+        public static bool IsSimpleListEqual(IEnumerable? oldValue, IEnumerable? newValue,Type underlyingType, Dictionary<string, BaseTypeComparer> customComparers, out OldNewPair oldNewPair)
         {
-            List<object?> list1 = [];
-            List<object?> list2 = [];
+            oldNewPair = OldNewPair.Get(newValue, newValue);
 
-            if (oldValue != null)
-                list1 = ((IEnumerable)oldValue).Cast<object?>().ToList();
-
-            if (newValue != null)
-                list1 = ((IEnumerable)newValue).Cast<object?>().ToList();
-
-
-            oldNewPair = OldNewPair.Get(list1, list2);
-            return CompareSimpleLists(list1, list2, customComparers);
+            var customComparer = GetCustomComparer(underlyingType, customComparers);
+            return CompareSimpleLists(oldValue, newValue, customComparer);
         }
 
-        public static bool CompareSimpleLists<T>(List<T> list1, List<T> list2, Dictionary<string, BaseTypeComparer> customComparers)
+        public static bool CompareSimpleLists(IEnumerable? enumerable1, IEnumerable? enumerable2,  BaseTypeComparer? customComparer)
         {
-            if (list1 == null || list2 == null)
-                return list1 == list2;
 
-            if (list1.Count != list2.Count)
+            if (enumerable1 == null || enumerable2 == null)
+                return enumerable1 == enumerable2;
+
+            if (enumerable1.Count != enumerable2.Count)
                 return false;
 
-            for (int i = 0; i < list1.Count; i++)
+            var enumerator1 = enumerable1.GetEnumerator();
+            var enumerator2 = enumerable2.GetEnumerator();
+
+            while(enumerator1.MoveNext() && enumerator2.MoveNext())
             {
-                if (!EqualsWithNullCheck(list1[i], list2[i], customComparers) )
+                if (!EqualsWithNullCheck(enumerator1.Current, enumerator2.Current, customComparer))
                     return false;
             }
 
             return true;
+        }
+
+        public static BaseTypeComparer? GetCustomComparer(Type? type, Dictionary<string, BaseTypeComparer> customComparers)
+        {
+            if(customComparers ==  null) 
+                return null;
+            customComparers.TryGetValue(type?.FullName??string.Empty, out BaseTypeComparer? value);
+            return value;
         }
 
         /// <summary>
@@ -44,14 +48,21 @@ namespace SimpleObjectComparer
         /// <param name="obj1"></param>
         /// <param name="obj2"></param>
         /// <returns></returns>
-        public static bool EqualsWithNullCheck(object? obj1, object? obj2, Dictionary<string, BaseTypeComparer> _customComparers)
+        public static bool EqualsWithNullCheck(object? obj1, object? obj2, Dictionary<string, BaseTypeComparer> customComparers)
         {
-            if (_customComparers.Count > 0)
-            {
-                var typeName = (obj1 ?? obj2)?.GetType()?.FullName ?? string.Empty;
-                if (_customComparers.TryGetValue(typeName, out BaseTypeComparer? value))
-                    return value.IsEqual(obj1, obj2);
-            }
+            return EqualsWithNullCheck(obj1, obj2, GetCustomComparer((obj1 ?? obj2)?.GetType(), customComparers));
+        }
+
+        /// <summary>
+        /// Not applicable for reference types
+        /// </summary>
+        /// <param name="obj1"></param>
+        /// <param name="obj2"></param>
+        /// <returns></returns>
+        public static bool EqualsWithNullCheck(object? obj1, object? obj2, BaseTypeComparer? customComparer)
+        {
+            if (customComparer != null)
+                return customComparer.IsEqual(obj1, obj2);
 
             if (obj1 == null && obj2 == null) return true;
             if (obj1 == null || obj2 == null) return false;
